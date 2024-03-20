@@ -42,7 +42,22 @@ from metrics import (
     get_mutual_information,
     get_correlation
 )
+def save_checkpoint(model, optimizer, epoch, loss, save_path):
+    checkpoint = {
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': loss,
+    }
+    torch.save(checkpoint, save_path)
 
+def load_checkpoint(model, optimizer, load_path):
+    checkpoint = torch.load(load_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+    return model, optimizer, epoch, loss
 def main(config, run_mode:str="train"):
     print(f"🥝 Start Running Reconstruction Network in {run_mode} mode")
     seed_everything(seed=config.SEED_NUM)
