@@ -254,7 +254,7 @@ def main(config, run_mode:str="train"):
         pprint(valid_metrics)
 
         test_metrics = trainer.test(
-            rec_model, dataloaders=dataloader["test"], verbose=False, ckpt_path="best"
+            rec_model, dataloaders=dataloader["test"], verbose=False
         )
         pprint(test_metrics)
 
