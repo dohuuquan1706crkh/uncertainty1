@@ -1,6 +1,6 @@
 DATA:
   SPACE: gray
-  ROOT: "/content/drive/MyDrive/Segmentation-Uncertainty/camus"
+  ROOT: "/kaggle/working/uncertainty1/camus"
   IMG_SIZE: 256
   BATCH_SIZE: 1
   NUM_WORKERS: 0
