@@ -63,6 +63,18 @@ class RecLoss(nn.Module):
         self.resi_max = resi_max
         self.gamma = gamma
         self.unc_mode = unc_mode
+        if self.unc_mode == "bayescap":
+            self.L_Gauss = GenGaussLoss(
+                reduction=self.reduction,
+                alpha_eps=self.alpha_eps, beta_eps=self.beta_eps, 
+                resi_min=self.resi_min, resi_max=self.resi_max
+            )
+        else:
+            self.L_Gauss = NormGaussLoss(
+                resi_min=self.resi_min,
+                resi_max=self.resi_max,
+                reduction=self.reduction
+            )
         self.L_l1 = nn.L1Loss(reduction=self.reduction)
     def forward(
         # self,
