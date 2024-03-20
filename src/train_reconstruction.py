@@ -226,19 +226,20 @@ def main(config, run_mode:str="train"):
                 config
             )
         
-        checkpoint_callback = ModelCheckpoint(
-            monitor='valid_dice',
-            dirpath=ckpt_dir,
-            filename=f"recons_{config.EXP_NAME}_" + "{epoch}-{valid_dice:.2f}",
-            mode='max',
-            save_top_k=1
-        )
+        # checkpoint_callback = ModelCheckpoint(
+        #     monitor='valid_dice',
+        #     dirpath=ckpt_dir,
+        #     filename=f"recons_{config.EXP_NAME}_" + "{epoch}-{valid_dice:.2f}",
+        #     mode='max',
+        #     save_top_k=1
+        # )
         trainer = pl.Trainer(
             check_val_every_n_epoch=config.EVAL_FREQ,       ## config.EVAL_FREQ,
             accelerator=config.DEVICE,
             devices=config.GPU_ID, ## 1
             max_epochs=config.NUM_EPOCHS,
-            callbacks=[MyProgressBar(), checkpoint_callback]
+            callbacks=[MyProgressBar()]
+            # callbacks=[MyProgressBar(), checkpoint_callback]
         )
 
         trainer.fit(
@@ -256,8 +257,18 @@ def main(config, run_mode:str="train"):
             rec_model, dataloaders=dataloader["test"], verbose=False, ckpt_path="best"
         )
         pprint(test_metrics)
+
+        save_checkpoint(
+            rec_model.model,
+            rec_model.optimizer,
+            epoch,
+            loss,
+            os.path.join(ckpt_dir, f"recons_{config.EXP_NAME}_epoch_{epoch}.pt")
+        )
+
         
-        print(f'Saved checkpoint @ {checkpoint_callback.best_model_path}')
+        # print(f'Saved checkpoint @ {checkpoint_callback.best_model_path}')
+        print(f'Saved checkpoint ')
     else:
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         print(f"🥝 Start Testing Reconstruction Network in {run_mode} mode")
@@ -370,6 +381,12 @@ def main(config, run_mode:str="train"):
         with open(save_cfg_path, 'w') as fp:
             json.dump(dict(config), fp)
         print(f"unc_metrics: {unc_metrics}")
+        if config.MODEL.RECONS_CKPT != "":
+            rec_backbone, _, _, _ = load_checkpoint(
+                rec_backbone, None, config.MODEL.RECONS_CKPT
+            )
+        else:
+            print("No checkpoint specified for testing!")
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
