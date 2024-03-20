@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch import Tensor
 import numpy as np
 import math
-from src.losses.gaussian import GenGaussLoss, NormGaussLoss
+from losses.gaussian import GenGaussLoss, NormGaussLoss
 
 # from src.losses.gaussian import GenGaussLoss, NormGaussLoss
 def get_device():
