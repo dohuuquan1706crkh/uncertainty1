@@ -14,7 +14,7 @@ from tqdm import tqdm
 import numpy as np
 import json
 
-from src.transforms import (
+from transforms import (
     get_training_augmentation,
     get_preprocessing,
     get_validation_augmentation
