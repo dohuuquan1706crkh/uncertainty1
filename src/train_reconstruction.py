@@ -14,26 +14,26 @@ from tqdm import tqdm
 import numpy as np
 import json
 
-from transforms import (
+from src.transforms import (
     get_training_augmentation,
     get_preprocessing,
     get_validation_augmentation
 )
 
-from dataset_seed import Dataset, ReconsDataset
+from src.dataset_seed import Dataset, ReconsDataset
 
-from load_cfg import load_config
+from src.load_cfg import load_config
 
-from models.bayesian import BayesCap, BNN, GaussCapContext
-from models.vae import VAE, ConvAutoencoder
-from models.custom_fpn import FPN
+from src.models.bayesian import BayesCap, BNN, GaussCapContext
+from src.models.vae import VAE, ConvAutoencoder
+from src.models.custom_fpn import FPN
 
-from models.segmentation import Segmentation
-from models.reconstruction import Reconstruction
+from src.models.segmentation import Segmentation
+from src.models.reconstruction import Reconstruction
 
-from losses.reconstruction import RecLoss
-from utils import seed_everything, load_checkpoint
-from metrics import (
+from src.losses.reconstruction import RecLoss
+from src.utils import seed_everything, load_checkpoint
+from src.metrics import (
     get_uncertainty_map,
     get_error_map,
     get_confidence,
@@ -42,22 +42,7 @@ from metrics import (
     get_mutual_information,
     get_correlation
 )
-def save_checkpoint(model, optimizer, epoch, loss, save_path):
-    checkpoint = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss,
-    }
-    torch.save(checkpoint, save_path)
 
-def load_checkpoint(model, optimizer, load_path):
-    checkpoint = torch.load(load_path)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    epoch = checkpoint['epoch']
-    loss = checkpoint['loss']
-    return model, optimizer, epoch, loss
 def main(config, run_mode:str="train"):
     print(f"🥝 Start Running Reconstruction Network in {run_mode} mode")
     seed_everything(seed=config.SEED_NUM)
@@ -226,20 +211,19 @@ def main(config, run_mode:str="train"):
                 config
             )
         
-        # checkpoint_callback = ModelCheckpoint(
-        #     monitor='valid_dice',
-        #     dirpath=ckpt_dir,
-        #     filename=f"recons_{config.EXP_NAME}_" + "{epoch}-{valid_dice:.2f}",
-        #     mode='max',
-        #     save_top_k=1
-        # )
+        checkpoint_callback = ModelCheckpoint(
+            monitor='valid_dice',
+            dirpath=ckpt_dir,
+            filename=f"recons_{config.EXP_NAME}_" + "{epoch}-{valid_dice:.2f}",
+            mode='max'
+        )
         trainer = pl.Trainer(
             check_val_every_n_epoch=config.EVAL_FREQ,       ## config.EVAL_FREQ,
             accelerator=config.DEVICE,
             devices=config.GPU_ID, ## 1
             max_epochs=config.NUM_EPOCHS,
-            callbacks=[MyProgressBar()]
-            # callbacks=[MyProgressBar(), checkpoint_callback]
+            callbacks=[MyProgressBar(), checkpoint_callback],
+            enable_checkpointing=True
         )
 
         trainer.fit(
@@ -254,21 +238,11 @@ def main(config, run_mode:str="train"):
         pprint(valid_metrics)
 
         test_metrics = trainer.test(
-            rec_model, dataloaders=dataloader["test"], verbose=False
+            rec_model, dataloaders=dataloader["test"], verbose=False, ckpt_path="best"
         )
         pprint(test_metrics)
-
-        save_checkpoint(
-            rec_model.model,
-            rec_model.optimizers,
-            epoch,
-            loss,
-            os.path.join(ckpt_dir, f"recons_{config.EXP_NAME}_epoch_{epoch}.pt")
-        )
-
         
-        # print(f'Saved checkpoint @ {checkpoint_callback.best_model_path}')
-        print(f'Saved checkpoint ')
+        print(f'Saved checkpoint @ {checkpoint_callback.best_model_path}')
     else:
         device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         print(f"🥝 Start Testing Reconstruction Network in {run_mode} mode")
@@ -381,12 +355,6 @@ def main(config, run_mode:str="train"):
         with open(save_cfg_path, 'w') as fp:
             json.dump(dict(config), fp)
         print(f"unc_metrics: {unc_metrics}")
-        if config.MODEL.RECONS_CKPT != "":
-            rec_backbone, _, _, _ = load_checkpoint(
-                rec_backbone, None, config.MODEL.RECONS_CKPT
-            )
-        else:
-            print("No checkpoint specified for testing!")
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
