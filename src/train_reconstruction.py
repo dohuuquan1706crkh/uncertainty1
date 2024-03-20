@@ -216,6 +216,7 @@ def main(config, run_mode:str="train"):
             dirpath=ckpt_dir,
             filename=f"recons_{config.EXP_NAME}_" + "{epoch}-{valid_dice:.2f}",
             mode='max'
+            save_top_k=1
         )
         trainer = pl.Trainer(
             check_val_every_n_epoch=config.EVAL_FREQ,       ## config.EVAL_FREQ,
