@@ -1,0 +1,25 @@
+DATA:
+  SPACE: gray
+  ROOT: "/content/drive/MyDrive/Segmentation-Uncertainty/camus"
+  IMG_SIZE: 256
+  BATCH_SIZE: 1
+  NUM_WORKERS: 0
+  CLASSES:
+    - background
+    - myo
+    - lv
+MODEL:
+  ARCH: FPN
+  ENCODER: efficientnet-b0
+  ENCODER_WEIGHTS: imagenet
+DEVICE: cuda
+NUM_EPOCHS: 1
+SAVE_DIR: "./outputs"
+EVAL_FREQ: 2
+GAMMA: 0.6
+UNC_MODE: vae
+IGNORE_BG: true
+USE_CONTEXT: true  ## true -> use context
+EXP_NAME: gausscap
+# EXP_NAME: conv
+SEED_NUM: 1

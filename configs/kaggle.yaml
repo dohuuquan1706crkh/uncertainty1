@@ -1,0 +1,24 @@
+DATA:
+  SPACE: "gray"
+  ROOT: "/kaggle/input/camus-lv/camus"
+  IMG_SIZE: 256
+  BATCH_SIZE: 32
+  NUM_WORKERS: 2
+  CLASSES:
+    - background
+    - myo
+    - lv
+MODEL:
+  ARCH: FPN
+  ENCODER: efficientnet-b0
+  ENCODER_WEIGHTS: imagenet
+  FROZEN_CKPT: /kaggle/input/camus-lv/frozen_concat_epoch29-valid_dataset_dice0.92.ckpt
+  # RECONS_CKPT: /kaggle/input/camus-lv/recons_concat_epoch19-valid_dice0.87.ckpt
+  RESUME_CKPT: /kaggle/input/camus-lv/recons_gausscap_epoch29-valid_dice0.84.ckpt
+NUM_EPOCHS: 60
+SAVE_DIR: "/kaggle/working/"
+EVAL_FREQ: 10
+GAMMA: 0.5
+UNC_MODE: vae
+IGNORE_BG: true
+USE_CONTEXT: false ## true

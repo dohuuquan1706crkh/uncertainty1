@@ -1,0 +1,24 @@
+DATA:
+  SPACE: "gray"
+  ROOT: "/kaggle/input/camus-lv/camus"
+  IMG_SIZE: 256
+  BATCH_SIZE: 8
+  NUM_WORKERS: 4
+  CLASSES:
+    - background
+    - myo
+    - lv
+MODEL:
+  ARCH: FPN
+  ENCODER: efficientnet-b0
+  ENCODER_WEIGHTS: imagenet
+DEVICE: gpu
+NUM_EPOCHS: 30 ## debug
+SAVE_DIR: "/kaggle/working"
+EVAL_FREQ: 10  ## debug
+GAMMA: 0.5
+UNC_MODE: bnn
+IGNORE_BG: true
+USE_CONTEXT: false
+EXP_NAME: gausscap
+SEED_NUM: 1

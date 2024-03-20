@@ -1,0 +1,27 @@
+DATA:
+  ROOT: "/kaggle/input/camus-lv/camus"
+  IMG_SIZE: 256
+  BATCH_SIZE: 4
+  NUM_WORKERS: 4
+  CLASSES:
+    - background
+    - myo
+    - lv
+MODEL:
+  ARCH: FPN
+  ENCODER: efficientnet-b0
+  ENCODER_WEIGHTS: imagenet
+  FROZEN_CKPT: "/kaggle/input/camus-lv/seed_1_FPN_efficientnet-b0_multicls.ckpt"
+  # RECONS_CKPT: "/kaggle/input/camus-lv/epoch19-valid_dice0.88_aggconv.ckpt"
+  # RECONS_CKPT: "/kaggle/input/camus-lv/epoch29-valid_dice0.89_catt.ckpt"
+  # RESUME_CKPT: "/kaggle/input/camus-lv/epoch19-valid_dice0.88_aggconv.ckpt"
+DEVICE: gpu
+NUM_EPOCHS: 80
+SAVE_DIR: "/kaggle/working/"
+EVAL_FREQ: 5
+GAMMA: 0.5
+UNC_MODE: bnn
+IGNORE_BG: true
+USE_CONTEXT: true
+EXP_NAME: cbam
+SEED_NUM: 1

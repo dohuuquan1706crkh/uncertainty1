@@ -1,0 +1,22 @@
+DATA:
+  SPACE: gray
+  ROOT: "/home/taing/workspace/Segmentation-Uncertainty/dataset/camus"
+  IMG_SIZE: 256
+  BATCH_SIZE: 32
+  NUM_WORKERS: 4
+  CLASSES:
+    - background
+    - myo
+    - lv
+MODEL:
+  ARCH: FPN  ## FPN
+  ENCODER: efficientnet-b0
+  ENCODER_WEIGHTS: imagenet
+DEVICE: gpu
+NUM_EPOCHS: 80 ## debug
+SAVE_DIR: "/home/taing/workspace/Segmentation-Uncertainty/outputs"
+EVAL_FREQ: 10  ## debug
+GAMMA: 0.5
+UNC_MODE: bnn ## train frozen only
+IGNORE_BG: true
+USE_CONTEXT: false

@@ -1,0 +1,27 @@
+DATA:
+  ROOT: "/kaggle/input/camus-lv/camus"
+  IMG_SIZE: 256
+  BATCH_SIZE: 32
+  NUM_WORKERS: 2
+  CLASSES:
+    - background
+    - myo
+    - lv
+MODEL:
+  ARCH: ENET
+  ENCODER: efficientnet-b0
+  ENCODER_WEIGHTS: imagenet
+  FROZEN_CKPT: ""
+  RECONS_CKPT: ""
+  # FROZEN_CKPT: "/kaggle/input/camus-lv/seed_1_FPN_efficientnet-b0_multicls.ckpt"
+  # RECONS_CKPT: "/kaggle/input/camus-lv/epoch39-valid_dice0.89.ckpt"
+DEVICE: gpu
+NUM_EPOCHS: 50 ## debug
+SAVE_DIR: "/kaggle/working"
+EVAL_FREQ: 5  ## debug
+GAMMA: 0.5
+UNC_MODE: ""
+IGNORE_BG: true
+USE_CONTEXT: false
+EXP_NAME: gausscap_enet
+SEED_NUM: 1
