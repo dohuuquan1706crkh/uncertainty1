@@ -260,7 +260,7 @@ def main(config, run_mode:str="train"):
 
         save_checkpoint(
             rec_model.model,
-            rec_model.optimizer,
+            rec_model.optimizers,
             epoch,
             loss,
             os.path.join(ckpt_dir, f"recons_{config.EXP_NAME}_epoch_{epoch}.pt")
