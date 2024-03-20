@@ -20,20 +20,20 @@ from transforms import (
     get_validation_augmentation
 )
 
-from src.dataset_seed import Dataset, ReconsDataset
+from dataset_seed import Dataset, ReconsDataset
 
-from src.load_cfg import load_config
+from load_cfg import load_config
 
-from src.models.bayesian import BayesCap, BNN, GaussCapContext
-from src.models.vae import VAE, ConvAutoencoder
-from src.models.custom_fpn import FPN
+from models.bayesian import BayesCap, BNN, GaussCapContext
+from models.vae import VAE, ConvAutoencoder
+from models.custom_fpn import FPN
 
-from src.models.segmentation import Segmentation
-from src.models.reconstruction import Reconstruction
+from models.segmentation import Segmentation
+from models.reconstruction import Reconstruction
 
-from src.losses.reconstruction import RecLoss
-from src.utils import seed_everything, load_checkpoint
-from src.metrics import (
+from losses.reconstruction import RecLoss
+from utils import seed_everything, load_checkpoint
+from metrics import (
     get_uncertainty_map,
     get_error_map,
     get_confidence,
