@@ -215,7 +215,7 @@ def main(config, run_mode:str="train"):
             monitor='valid_dice',
             dirpath=ckpt_dir,
             filename=f"recons_{config.EXP_NAME}_" + "{epoch}-{valid_dice:.2f}",
-            mode='max'
+            mode='max',
             save_top_k=1
         )
         trainer = pl.Trainer(
