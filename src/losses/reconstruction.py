@@ -77,70 +77,70 @@ class RecLoss(nn.Module):
             )
         self.L_l1 = nn.L1Loss(reduction=self.reduction)
     def forward(
-        # self,
-        # mean: Tensor,   ## before sm batch x C x size
-        # yhat: Tensor, ## yhat
-        # mask: Tensor, ## mask i.e y
-        # gauss_params
-        # ):
-        # # out_mu, yhat, mask, gauss_params
-        # y_predict=mean/torch.sum(mean,dim=1).unsqueeze(1)
-        # y_hat=yhat.permute(0, 2,3, 1)        
-        # y_hat=y_hat.reshape(-1, y_hat.shape[3])
-        # y_predict=y_predict.permute(0, 2,3, 1)
-        # y_predict=y_predict.reshape(-1, y_predict.shape[3])
-        # y=mask.permute(0, 2,3, 1)  
-        # y=y.reshape(-1, y.shape[3])
-        # ## mean and yhat is before softmax
-        # l1 = self.L_l1(y, y_hat)
-        # l2 = loglikelihood_loss(y,y_predict)
-        # kl_alpha = (y_predict - 1) * (1 - y) + 1
-        # l3 = kl_divergence(kl_alpha, y_predict.shape[1])
-        # l = l1 + l2 +l3
-        # return torch.sum(l)
         self,
-        mean: Tensor,   ## before sm
+        mean: Tensor,   ## before sm batch x C x size
         yhat: Tensor, ## yhat
-        mask: Tensor, ## mask
+        mask: Tensor, ## mask i.e y
         gauss_params
-    ):  # out_mu, yhat, mask, gauss_params
-        
+        ):
+        # out_mu, yhat, mask, gauss_params
+        y_predict=mean/torch.sum(mean,dim=1).unsqueeze(1)
+        y_hat=yhat.permute(0, 2,3, 1)        
+        y_hat=y_hat.reshape(-1, y_hat.shape[3])
+        y_predict=y_predict.permute(0, 2,3, 1)
+        y_predict=y_predict.reshape(-1, y_predict.shape[3])
+        y=mask.permute(0, 2,3, 1)  
+        y=y.reshape(-1, y.shape[3])
         ## mean and yhat is before softmax
-        l1 = self.L_l1(mean, yhat)
-
-        ##target1 is the base model output for identity mapping
-        ##target2 is the ground truth for the GenGauss loss
+        l1 = self.L_l1(y, y_hat)
+        l2 = loglikelihood_loss(y,y_predict)
+        kl_alpha = (y_predict - 1) * (1 - y) + 1
+        l3 = kl_divergence(kl_alpha, y_predict.shape[1])
+        l = l1 + l2 +l3
+        return torch.sum(l)
+    #     self,
+    #     mean: Tensor,   ## before sm
+    #     yhat: Tensor, ## yhat
+    #     mask: Tensor, ## mask
+    #     gauss_params
+    # ):  # out_mu, yhat, mask, gauss_params
         
-        ## need to convert from onehot [B, 3, W, H] -> [B, 1, W, H]
+    #     ## mean and yhat is before softmax
+    #     l1 = self.L_l1(mean, yhat)
 
-        mean = mean.softmax(dim=1)
-        # mean = torch.argmax(mean, dim=1)
-        # mean = torch.unsqueeze(mean, dim=1)
+    #     ##target1 is the base model output for identity mapping
+    #     ##target2 is the ground truth for the GenGauss loss
+        
+    #     ## need to convert from onehot [B, 3, W, H] -> [B, 1, W, H]
 
-        # yhat = torch.argmax(yhat, dim=1)
-        # yhat = torch.unsqueeze(yhat, dim=1)
-        # yhat = yhat.float()
+    #     mean = mean.softmax(dim=1)
+    #     # mean = torch.argmax(mean, dim=1)
+    #     # mean = torch.unsqueeze(mean, dim=1)
 
-        # mask = torch.argmax(mask, dim=1)
-        # mask = torch.unsqueeze(mask, dim=1)
-        # mask = mask.float()
+    #     # yhat = torch.argmax(yhat, dim=1)
+    #     # yhat = torch.unsqueeze(yhat, dim=1)
+    #     # yhat = yhat.float()
 
-        if self.unc_mode == "bayescap":
-            one_over_alpha, beta = gauss_params
-            l2 = self.L_Gauss(mean, one_over_alpha, beta, mask)
-        elif self.unc_mode in ["bnn", "vae", "teacher-student"]:
-            sigma = gauss_params
-            l2 = self.L_Gauss(mean, mask, sigma)
-        else:
-            raise(f"{self.unc_mode} doesnt implement")
+    #     # mask = torch.argmax(mask, dim=1)
+    #     # mask = torch.unsqueeze(mask, dim=1)
+    #     # mask = mask.float()
 
-        # l = self.gamma*l1 + (1-self.gamma)*l2
-        # l = 2*self.gamma*l1 + self.gamma*l2
-        l = l1 + self.gamma*l2
-        # l = (1+torch.exp(-l2))*l1 + (self.gamma+torch.exp(-l1))*l2
-        # l = (1+torch.exp(-l2))*l1 + torch.exp(-l1)*l2
-        # l = l1 + torch.exp(l2)*l2
-        return l
+    #     if self.unc_mode == "bayescap":
+    #         one_over_alpha, beta = gauss_params
+    #         l2 = self.L_Gauss(mean, one_over_alpha, beta, mask)
+    #     elif self.unc_mode in ["bnn", "vae", "teacher-student"]:
+    #         sigma = gauss_params
+    #         l2 = self.L_Gauss(mean, mask, sigma)
+    #     else:
+    #         raise(f"{self.unc_mode} doesnt implement")
+
+    #     # l = self.gamma*l1 + (1-self.gamma)*l2
+    #     # l = 2*self.gamma*l1 + self.gamma*l2
+    #     l = l1 + self.gamma*l2
+    #     # l = (1+torch.exp(-l2))*l1 + (self.gamma+torch.exp(-l1))*l2
+    #     # l = (1+torch.exp(-l2))*l1 + torch.exp(-l1)*l2
+    #     # l = l1 + torch.exp(l2)*l2
+    #     return l
 if __name__ == "__main__":
     x1 = torch.randn(4,3,5,5)
     x2 = torch.rand(4,3,5,5)
